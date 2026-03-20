@@ -48,6 +48,17 @@ class statscheckup extends Module
         $this->ps_versions_compliancy = ['min' => '1.7.1.0', 'max' => _PS_VERSION_];
     }
 
+    /**
+     * Install the module, save default threshold configuration values, and register the stats hook.
+     *
+     * Default thresholds (configurable via module settings):
+     *   CHECKUP_DESCRIPTIONS_LT/GT  — minimum/recommended description length in characters
+     *   CHECKUP_IMAGES_LT/GT        — minimum/recommended image count per product
+     *   CHECKUP_SALES_LT/GT         — minimum/recommended sales count
+     *   CHECKUP_STOCK_LT/GT         — minimum/recommended stock level
+     *
+     * @return bool True on successful installation, false otherwise
+     */
     public function install()
     {
         $confs = [
@@ -69,6 +80,15 @@ class statscheckup extends Module
         return parent::install() && $this->registerHook('displayAdminStatsModules');
     }
 
+    /**
+     * Render the store health check report on the admin statistics dashboard.
+     *
+     * Evaluates products against configurable thresholds for description length,
+     * image count, sales volume, and stock level, presenting a colour-coded summary.
+     * Handles both form submission (threshold save) and display.
+     *
+     * @return string HTML output for the health check widget
+     */
     public function hookDisplayAdminStatsModules()
     {
         if (Tools::isSubmit('submitCheckup')) {
