@@ -98,9 +98,7 @@ class StatscheckupHookTest extends StatscheckupTestCase
         statscheckup_insert_stock(1, 4);
         list($html) = statscheckup_run_hook($this->module);
         $report = new ScoreReport($html);
-        $cell = $report->getBodyCellHtml(1, 'Item');
-        $this->assertContains('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdef', $cell);
-        $this->assertNotContains('abcdefghijklmn', $cell);
+        $this->assertSame('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdef', $report->getBodyLinkText(1));
     }
 
     public function testProductNameIsHtmlEscaped()

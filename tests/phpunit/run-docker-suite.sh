@@ -37,13 +37,18 @@ else
 fi
 
 if ! $DOCKER container inspect "$DB_NAME" >/dev/null 2>&1; then
+    if [ "$NETWORK_MODE" = "host" ]; then
+        MARIADB_EXTRA="--bind-address=127.0.0.1"
+    else
+        MARIADB_EXTRA=""
+    fi
     $DOCKER run -d --name "$DB_NAME" $DB_NETWORK \
         -e MARIADB_DATABASE=statscheckup \
         -e MARIADB_USER=statscheckup \
         -e MARIADB_PASSWORD=statscheckup \
         -e MARIADB_ROOT_PASSWORD=statscheckup \
         "$MARIADB_IMAGE" \
-        --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --bind-address=127.0.0.1
+        --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci $MARIADB_EXTRA
 fi
 
 if ! $DOCKER image inspect "$PHP_IMAGE" >/dev/null 2>&1; then
