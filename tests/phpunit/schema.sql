@@ -1,0 +1,84 @@
+CREATE TABLE IF NOT EXISTS ps_configuration (
+    name VARCHAR(254) NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_module (
+    id_module INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS ps_hook (
+    id_hook INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS ps_hook_module (
+    id_hook INT UNSIGNED NOT NULL,
+    id_module INT UNSIGNED NOT NULL,
+    id_shop INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_lang (
+    id_lang INT UNSIGNED NOT NULL PRIMARY KEY,
+    iso_code VARCHAR(8) NOT NULL,
+    name VARCHAR(32) NOT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS ps_lang_shop (
+    id_lang INT UNSIGNED NOT NULL,
+    id_shop INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_product (
+    id_product INT UNSIGNED NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS ps_product_shop (
+    id_product INT UNSIGNED NOT NULL,
+    id_shop INT UNSIGNED NOT NULL,
+    active TINYINT(1) NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS ps_product_lang (
+    id_product INT UNSIGNED NOT NULL,
+    id_lang INT UNSIGNED NOT NULL,
+    id_shop INT UNSIGNED NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_image (
+    id_image INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_product INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_image_shop (
+    id_image INT UNSIGNED NOT NULL,
+    id_shop INT UNSIGNED NOT NULL,
+    id_product INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_orders (
+    id_order INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_shop INT UNSIGNED NOT NULL,
+    invoice_date DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_order_detail (
+    id_order_detail INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_order INT UNSIGNED NOT NULL,
+    product_id INT UNSIGNED NOT NULL,
+    product_quantity INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ps_stock_available (
+    id_stock_available INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_product INT UNSIGNED NOT NULL,
+    id_product_attribute INT UNSIGNED NOT NULL DEFAULT 0,
+    id_shop INT UNSIGNED NOT NULL,
+    id_shop_group INT UNSIGNED NOT NULL DEFAULT 0,
+    quantity INT NOT NULL DEFAULT 0
+);

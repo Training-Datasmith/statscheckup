@@ -59,7 +59,7 @@ class statscheckup extends Module
             'CHECKUP_STOCK_GT' => 3,
         ];
         foreach ($confs as $confname => $confdefault) {
-            if (!Configuration::get($confname)) {
+            if (Configuration::get($confname) === false) {
                 Configuration::updateValue($confname, (int) $confdefault);
             }
         }
@@ -259,6 +259,9 @@ class statscheckup extends Module
                     $row['desclength_' . $description['iso_code']] = Tools::strlen(strip_tags($description['description']));
                 }
                 if (isset($description['iso_code'])) {
+                    if (!isset($row['desclength_' . $description['iso_code']])) {
+                        $row['desclength_' . $description['iso_code']] = 0;
+                    }
                     $scores['description_' . $description['iso_code']] = ($row['desclength_' . $description['iso_code']] < Configuration::get('CHECKUP_DESCRIPTIONS_LT') ? 0 : ($row['desclength_' . $description['iso_code']] > Configuration::get('CHECKUP_DESCRIPTIONS_GT') ? 2 : 1));
                     $totals['description_' . $description['iso_code']] += $scores['description_' . $description['iso_code']];
                 }
@@ -269,7 +272,7 @@ class statscheckup extends Module
             $this->html .= '
 				<tr>
 					<td>' . $row['id_product'] . '</td>
-					<td><a href="' . Tools::safeOutput($this->context->link->getAdminLink('AdminProducts', true, [], ['updateproduct' => 1, 'id_product' => $row['id_product']])) . '">' . Tools::substr($row['name'], 0, 42) . '</a></td>
+                    <td><a href="' . Tools::safeOutput($this->context->link->getAdminLink('AdminProducts', true, [], ['updateproduct' => 1, 'id_product' => $row['id_product']])) . '">' . Tools::htmlentitiesUTF8(Tools::substr($row['name'], 0, 42)) . '</a></td>
 					<td class="center">' . $array_colors[$scores['active']] . '</td>';
             foreach ($languages as $language) {
                 if (isset($row['desclength_' . $language['iso_code']])) {
@@ -300,7 +303,9 @@ class statscheckup extends Module
             $totals['description_' . $language['iso_code']] = $totals['description_' . $language['iso_code']] / $totals['products'];
             $totals['description_' . $language['iso_code']] = ($totals['description_' . $language['iso_code']] < 1 ? 0 : ($totals['description_' . $language['iso_code']] > 1.5 ? 2 : 1));
         }
-        $totals['average'] = array_sum($totals) / $divisor;
+        $scoreTotals = $totals;
+        unset($scoreTotals['products']);
+        $totals['average'] = array_sum($scoreTotals) / $divisor;
         $totals['average'] = ($totals['average'] < 1 ? 0 : ($totals['average'] > 1.5 ? 2 : 1));
 
         $this->html .= '
